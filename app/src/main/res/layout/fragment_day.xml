@@ -7,21 +7,22 @@
     android:layout_height="match_parent"
 
     android:background="@color/depth0"
-    tools:context=".ui.login.LoginFragment">
-
+    tools:context=".MainActivity">
 
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="290dp"
         android:layout_height="100dp"
-        android:text="TEST"
+        android:layout_marginTop="252dp"
+        android:text="TESasdfasdfT"
         android:textAlignment="center"
         android:textColor="@color/mainLight"
         android:textSize="48sp"
-        android:textStyle="bold"
 
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.867"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

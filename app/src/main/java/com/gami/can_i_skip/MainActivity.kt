@@ -2,50 +2,77 @@ package com.gami.can_i_skip
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import io.github.wulkanowy.sdk.Sdk
-import io.github.wulkanowy.sdk.pojo.RegisterUser
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
-import com.gami.can_i_skip.Constants
+
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import com.gami.can_i_skip.databinding.ActivityMainBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
+
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
         setContentView(R.layout.activity_main)
 
-        val logInButton = findViewById(R.id.log_in_button) as Button
-        logInButton.setOnClickListener {
-            Log.d("TEST", "deez nuts");
-            GlobalScope.launch {
-                loginUser()
+        val navMenu = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+
+        val loginFragment = LoginFragment();
+        val subjectFragment = SubjectFragment();
+        val dayFragment = DayFragment();
+
+        supportFragmentManager.beginTransaction().replace(R.id.fragmentHost, loginFragment)
+            .commit()
+        Log.d("TEST", "test")
+        Log.d("TEST", navMenu.toString())
+        navMenu.setOnItemSelectedListener {
+            Log.d("test", it.toString())
+            when (it.itemId) {
+                R.id.nav_day -> {
+
+                    replaceFragment(dayFragment);true
+                }
+
+                R.id.nav_subject -> {
+
+                    replaceFragment(subjectFragment)
+
+
+                    true
+                }
+
+                else -> false
+
             }
-            Log.d("nut", "deez nuts");
+
 
         }
 
+
     }
 
-    suspend fun loginUser() {
-        val sdk = Sdk()
-
-        val email = Constants().EMAIL
-        val password = Constants().PASSWORD
-        val scrapperBaseUrl = Constants().SCRAPPER_BASE_URL
-        val symbol = Constants().SYMBOL
-
-        Log.d("EMAIL", email);
-
-        val user: RegisterUser = sdk.getUserSubjectsFromScrapper(
-            email = email,
-            password = password,
-            scrapperBaseUrl = scrapperBaseUrl,
-            symbol =symbol,
-        )
-        Log.d("TEST", user.toString());
+    fun replaceFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().replace(R.id.fragmentHost, fragment).commit()
     }
 
 
 }
+
+
+/*    suspend fun getAttendanceSummary()
+    {
+        val attendanceSummary = mutableListOf<List<AttendanceSummary>>();
+        val subjects = sdk.getSubjects();
+        subjects.forEach{
+            val attendance = sdk.getAttendanceSummary(it.id)
+            attendanceSummary.add(attendance)
+            Log.d("ATTENDANCE", "${it.name}, ${attendance}")
+        }
+    }*/
+

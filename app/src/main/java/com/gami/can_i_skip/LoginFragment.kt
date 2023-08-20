@@ -1,58 +1,34 @@
-package com.gami.can_i_skip.ui.login
+package com.gami.can_i_skip
 
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.Toast
-import androidx.navigation.NavController
 import com.gami.can_i_skip.databinding.FragmentLoginBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
-import com.gami.can_i_skip.R
 import io.github.wulkanowy.sdk.Sdk
 import io.github.wulkanowy.sdk.pojo.RegisterStudent
 import io.github.wulkanowy.sdk.pojo.RegisterUser
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import com.gami.can_i_skip.App
+
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
-    private lateinit var loginViewModel: LoginViewModel
-    private var _binding: FragmentLoginBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
 
-        _binding = FragmentLoginBinding.inflate(inflater, container, false)
-        return binding.root
-
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
-            .get(LoginViewModel::class.java)
 
+        val navbar = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
+        navbar.visibility = View.GONE
         val logInButton = view.findViewById<Button>(R.id.log_in_button)
         logInButton.setOnClickListener {
             val inputEmail = view.findViewById<EditText>(R.id.inputEmail).text.toString();
@@ -96,14 +72,15 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             studentId = registerStudent.studentId
             diaryId = semester.diaryId
         }
+        val transaction = activity?.supportFragmentManager?.beginTransaction()
+        transaction?.replace(R.id.fragmentHost, SubjectFragment())
+        transaction?.disallowAddToBackStack()
+        transaction?.commit()
 
 
 
 
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+
 }

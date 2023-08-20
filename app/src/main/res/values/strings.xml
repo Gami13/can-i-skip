@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">can-i-skip</string>
+    <string name="app_name">Can I Skip?</string>
+    <string name="emailPrompt">E-Mail:</string>
+    <string name="passwordPrompt">Password:</string>
+    <!-- Strings related to login -->
+    <string name="nav_day">By Day</string>
+    <string name="nav_subject">By Subject</string>
 </resources>
