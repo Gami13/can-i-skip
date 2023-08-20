@@ -1,8 +1,17 @@
 <resources>
     <string name="app_name">Can I Skip?</string>
-    <string name="emailPrompt">E-Mail:</string>
-    <string name="passwordPrompt">Password:</string>
+    <string name="email_prompt">E-Mail:</string>
+    <string name="password_prompt">Password:</string>
+    <string name="log_in">Log In</string>
+    <string name="please_wait">Please Wait…</string>
+    <string name="login_failed">Login Failed</string>
+<string name="login_failed_message">Please check your credentials and try again.</string>
+
     <!-- Strings related to login -->
     <string name="nav_day">By Day</string>
     <string name="nav_subject">By Subject</string>
+
+    <string name="baseurl_standard">Standard</string>
+    <string name="baseurl_custom_suffix">Custom domain suffix</string>
+    <string name="baseurl_prompt">Choose your login URL</string>
 </resources>

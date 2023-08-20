@@ -1,83 +1,166 @@
 package com.gami.can_i_skip
 
-import androidx.lifecycle.ViewModelProvider
-import androidx.fragment.app.Fragment
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.EditText
-import com.gami.can_i_skip.databinding.FragmentLoginBinding
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
-
 import io.github.wulkanowy.sdk.Sdk
 import io.github.wulkanowy.sdk.pojo.RegisterStudent
 import io.github.wulkanowy.sdk.pojo.RegisterUser
-import kotlinx.coroutines.GlobalScope
+import io.github.wulkanowy.sdk.scrapper.login.BadCredentialsException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.io.File
 
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
 
-
-
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         super.onViewCreated(view, savedInstanceState)
+
+
+        val filesDir = context?.filesDir;
+        val file = File(filesDir, "credentials")
+
+        val credentials = file.readLines()
+        if (credentials.size == 3) {
+            val email = credentials[0]
+            val password = credentials[1]
+            val baseUrl = credentials[2]
+            runBlocking {
+                launch { loginUser(email, password, baseUrl, view) }
+            }
+        }
+
 
 
         val navbar = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
         navbar.visibility = View.GONE
         val logInButton = view.findViewById<Button>(R.id.log_in_button)
+        val baseUrls = resources.getStringArray(R.array.hosts_keys)
+        val baseUrlsValues = resources.getStringArray(R.array.hosts_values)
+
+        val arrayAdapter = ArrayAdapter(view.context, R.layout.list_item, baseUrls)
+        view.findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView).setAdapter(arrayAdapter)
+
+
+
         logInButton.setOnClickListener {
+
+
             val inputEmail = view.findViewById<EditText>(R.id.inputEmail).text.toString();
             val inputPassword = view.findViewById<EditText>(R.id.inputPassword).text.toString();
-
-            Log.d("TEST", "$inputEmail $inputPassword");
-            GlobalScope.launch {
-                loginUser()
+            val inputBaseUrl =
+                view.findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView).text.toString();
+            if (inputEmail.isEmpty() || inputPassword.isEmpty() || inputBaseUrl.isEmpty()) {
+                Toast.makeText(view.context, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
-            Log.d("nut", "deez nuts");
 
+
+            val inputBaseUrlValue = baseUrlsValues[baseUrls.indexOf(inputBaseUrl)]
+
+
+            Log.d("TEST", "$inputEmail, $inputPassword, $inputBaseUrl, $inputBaseUrlValue");
+
+
+
+
+            runBlocking {
+
+                launch { loginUser(inputEmail, inputPassword, inputBaseUrlValue, view) }
+            }
+
+            Log.d("nut", "deez nuts");
         }
 
 
     }
 
-    suspend fun loginUser() {
+    suspend fun loginUser(
+        emailI: String,
+        passwordI: String,
+        scrapperBaseUrlI: String,
+        view: View
+    ): Boolean {
+        /*   DONT KNOW WHY DOESNT WORK
+             val logInButton = view.findViewById<Button>(R.id.log_in_button)
+             Log.d("TEST", "logging")
+             logInButton.isClickable = false;
+             logInButton.setText(R.string.please_wait);
 
+             val colorFrom = view.context.getColor(R.color.main)
+             val colorTo = view.context.getColor(R.color.mainDisabled)
+             val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
+             colorAnimation.duration = 250 // milliseconds
 
-        val user: RegisterUser = App().sdk.getUserSubjectsFromScrapper(
-            email = App().emailProper,
-            password = App().passwordProper,
-            scrapperBaseUrl = App().scrapperBaseUrlProper,
-            symbol = App().symbolProper,
-        )
-        val registerSymbol = user.symbols
-            .filter { it.schools.isNotEmpty() }
-            .first { it.schools.all { school -> school.subjects.isNotEmpty() } }
-        val registerUnit = registerSymbol.schools.first()
-        val registerStudent = registerUnit.subjects.filterIsInstance<RegisterStudent>().first()
-        Log.d("TEST", registerStudent.semesters.toString())
-        val semester = registerStudent.semesters.first()
-        App().sdk.apply {
-            email = App().emailProper
-            password = App().passwordProper
-            scrapperBaseUrl = App().scrapperBaseUrlProper
-            loginType = Sdk.ScrapperLoginType.valueOf(user.loginType?.name!!)
+             colorAnimation.addUpdateListener { animator -> logInButton.setBackgroundColor(animator.animatedValue as Int) }
+             colorAnimation.start()
 
-            symbol = registerSymbol.symbol
-            schoolSymbol = registerUnit.schoolId
-            studentId = registerStudent.studentId
-            diaryId = semester.diaryId
+             logInButton.setBackgroundColor(
+                 ContextCompat.getColor(
+                     view.context,
+                     R.color.mainDisabled
+                 )
+             )*/
+        try {
+            val user: RegisterUser = App().sdk.getUserSubjectsFromScrapper(
+                email = emailI,
+                password = passwordI,
+                scrapperBaseUrl = scrapperBaseUrlI,
+
+                )
+            Log.d("USER", user.toString())
+
+            val registerSymbol = user.symbols
+                .filter { it.schools.isNotEmpty() }
+                .first { it.schools.all { school -> school.subjects.isNotEmpty() } }
+
+            val registerUnit = registerSymbol.schools.first()
+            val registerStudent = registerUnit.subjects.filterIsInstance<RegisterStudent>().first()
+            Log.d("TEST", registerStudent.semesters.toString())
+            val semester = registerStudent.semesters.first()
+            App().sdk.apply {
+                email = emailI
+                password = passwordI
+                scrapperBaseUrl = scrapperBaseUrlI
+                loginType = Sdk.ScrapperLoginType.valueOf(user.loginType?.name!!)
+
+                symbol = registerSymbol.symbol
+                schoolSymbol = registerUnit.schoolId
+                studentId = registerStudent.studentId
+                diaryId = semester.diaryId
+            }
+
+            val filesDir = context?.filesDir;
+            val file = File(filesDir, "credentials")
+            file.writeText(emailI + "\n" + passwordI + "\n" + scrapperBaseUrlI)
+            val transaction = activity?.supportFragmentManager?.beginTransaction()
+            transaction?.replace(R.id.fragmentHost, SubjectFragment())
+            transaction?.disallowAddToBackStack()
+            transaction?.commit()
+            return true
+        } catch (e: BadCredentialsException) {
+            Log.d("TEST", "bad credentials")
+            AlertDialog.Builder(view.context)
+                .setTitle(R.string.login_failed)
+                .setMessage(R.string.login_failed_message)
+                .setNeutralButton(android.R.string.ok, null)
+
+                .show()
+            Toast.makeText(view.context, R.string.login_failed, Toast.LENGTH_SHORT).show()
+            return false
         }
-        val transaction = activity?.supportFragmentManager?.beginTransaction()
-        transaction?.replace(R.id.fragmentHost, SubjectFragment())
-        transaction?.disallowAddToBackStack()
-        transaction?.commit()
-
-
 
 
     }

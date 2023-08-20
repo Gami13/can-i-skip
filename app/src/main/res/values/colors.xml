@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="depth0">#111112</color>
-    <color name="depth1">#19191a</color>
-    <color name="depth2">#212121</color>
-    <color name="depth3">#27272a</color>
-    <color name="depth4">#2f2f32</color>
-    <color name="main">#410ea0</color>
-    <color name="mainLight">#9332E8</color>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
+    <color name="depth0">#19191a</color>
+    <color name="depth1">#212121</color>
+    <color name="depth2">#27272a</color>
+    <color name="depth3">#2f2f32</color>
+    <color name="mainDisabled">#676177</color>
+    <color name="main">#6750A4</color>
+    <color name="mainLight">#9332E8</color>
+    <color name="mtrl_textinput_default_box_stroke_color" tools:override="true" >#fff</color>
     <color name="text">#D6D6D6</color>
 
 </resources>

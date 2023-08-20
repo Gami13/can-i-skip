@@ -1,5 +1,6 @@
 package com.gami.can_i_skip
 
+import android.credentials.Credential
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -10,6 +11,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.gami.can_i_skip.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.security.KeyStore
 
 
 class MainActivity : AppCompatActivity() {
@@ -27,9 +31,14 @@ class MainActivity : AppCompatActivity() {
         val subjectFragment = SubjectFragment();
         val dayFragment = DayFragment();
 
-        supportFragmentManager.beginTransaction().replace(R.id.fragmentHost, loginFragment)
-            .commit()
-        Log.d("TEST", "test")
+
+
+
+        replaceFragment(loginFragment)
+
+
+
+
         Log.d("TEST", navMenu.toString())
         navMenu.setOnItemSelectedListener {
             Log.d("test", it.toString())

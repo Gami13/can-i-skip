@@ -1,12 +1,18 @@
 package com.gami.can_i_skip
 
 import android.app.Application
+import android.content.Context
+import android.util.Log
 import io.github.wulkanowy.sdk.Sdk
+import java.io.File
 
 class App : Application() {
+    private var context: Context? = null
     var sdk = Sdk()
-    var emailProper = Constants().EMAIL
-    var passwordProper = Constants().PASSWORD
-    var scrapperBaseUrlProper = Constants().SCRAPPER_BASE_URL
-    var symbolProper= Constants().SYMBOL
+    override fun onCreate() {
+        super.onCreate()
+        context = applicationContext
+    }
+
+
 }
