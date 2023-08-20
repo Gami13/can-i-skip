@@ -2,10 +2,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     android:background="@color/depth0"
-    tools:context=".MainActivity">
+    tools:context=".ui.login.LoginFragment">
 
     <Button
         android:id="@+id/log_in_button"
@@ -40,13 +42,13 @@
         android:id="@+id/inputPassword"
         android:layout_width="290dp"
         android:layout_height="42dp"
-        android:layout_marginBottom="300dp"
+        android:layout_marginBottom="140dp"
         android:ems="10"
         android:inputType="textPassword"
         android:textColor="@color/text"
         app:layout_constraintBottom_toTopOf="@+id/log_in_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -88,5 +90,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
