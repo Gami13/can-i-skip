@@ -39,9 +39,9 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        Log.d("TEST", navMenu.toString())
+
         navMenu.setOnItemSelectedListener {
-            Log.d("test", it.toString())
+
             when (it.itemId) {
                 R.id.nav_day -> {
 

@@ -19,7 +19,7 @@ import io.github.wulkanowy.sdk.scrapper.login.BadCredentialsException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
-
+import com.gami.can_i_skip.App.Companion.sdk
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
@@ -114,13 +114,13 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                  )
              )*/
         try {
-            val user: RegisterUser = App().sdk.getUserSubjectsFromScrapper(
+            val user: RegisterUser = sdk.getUserSubjectsFromScrapper(
                 email = emailI,
                 password = passwordI,
                 scrapperBaseUrl = scrapperBaseUrlI,
 
                 )
-            Log.d("USER", user.toString())
+
 
             val registerSymbol = user.symbols
                 .filter { it.schools.isNotEmpty() }
@@ -128,9 +128,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
             val registerUnit = registerSymbol.schools.first()
             val registerStudent = registerUnit.subjects.filterIsInstance<RegisterStudent>().first()
-            Log.d("TEST", registerStudent.semesters.toString())
+
             val semester = registerStudent.semesters.first()
-            App().sdk.apply {
+            sdk.apply {
                 email = emailI
                 password = passwordI
                 scrapperBaseUrl = scrapperBaseUrlI
@@ -142,6 +142,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 diaryId = semester.diaryId
             }
 
+
+
+            Log.d("SDK", "Schoold id: ${registerUnit.schoolId}")
+            Log.d("SDK", "Student id: ${registerStudent.studentId}")
+
             val filesDir = context?.filesDir;
             val file = File(filesDir, "credentials")
             file.writeText(emailI + "\n" + passwordI + "\n" + scrapperBaseUrlI)
@@ -151,7 +156,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             transaction?.commit()
             return true
         } catch (e: BadCredentialsException) {
-            Log.d("TEST", "bad credentials")
+
             AlertDialog.Builder(view.context)
                 .setTitle(R.string.login_failed)
                 .setMessage(R.string.login_failed_message)

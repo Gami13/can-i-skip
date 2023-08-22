@@ -7,10 +7,12 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import io.github.wulkanowy.sdk.pojo.AttendanceSummary
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class DayFragment:Fragment(R.layout.fragment_day) {
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -23,4 +25,5 @@ class DayFragment:Fragment(R.layout.fragment_day) {
 
 
     }
+
 }
