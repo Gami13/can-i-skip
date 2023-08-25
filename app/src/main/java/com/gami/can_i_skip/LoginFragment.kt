@@ -29,20 +29,17 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         super.onViewCreated(view, savedInstanceState)
 
 
-        val filesDir = context?.filesDir;
-        val file = File(filesDir, "credentials")
 
-        val credentials = file.readLines()
-        if (credentials.size == 3) {
-            val email = credentials[0]
-            val password = credentials[1]
-            val baseUrl = credentials[2]
-            runBlocking {
-                launch { loginUser(email, password, baseUrl, view) }
-            }
+
+        if (App.credentials.email != "") {
+
+            val transaction = activity?.supportFragmentManager?.beginTransaction()
+            transaction?.replace(R.id.fragmentHost, SubjectFragment())
+            transaction?.disallowAddToBackStack()
+            transaction?.commit()
+            App.topBar?.title = getString(R.string.topbar_by_subject)
+            return
         }
-
-
 
         val navbar = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
         navbar.visibility = View.GONE
@@ -130,26 +127,25 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             val registerStudent = registerUnit.subjects.filterIsInstance<RegisterStudent>().first()
 
             val semester = registerStudent.semesters.first()
-            sdk.apply {
-                email = emailI
-                password = passwordI
-                scrapperBaseUrl = scrapperBaseUrlI
-                loginType = Sdk.ScrapperLoginType.valueOf(user.loginType?.name!!)
-
-                symbol = registerSymbol.symbol
-                schoolSymbol = registerUnit.schoolId
-                studentId = registerStudent.studentId
-                diaryId = semester.diaryId
-            }
+            App.credentials = Credentials(
+                email = emailI,
+                password = passwordI,
+                scrapperBaseUrl = scrapperBaseUrlI,
+                loginType = user.loginType?.name!!,
+                symbol = registerSymbol.symbol,
+                schoolSymbol = registerUnit.schoolId,
+                studentId = registerStudent.studentId,
+                diaryId = semester.diaryId,
+            )
+            App.prepareSDK()
 
 
 
             Log.d("SDK", "Schoold id: ${registerUnit.schoolId}")
             Log.d("SDK", "Student id: ${registerStudent.studentId}")
 
-            val filesDir = context?.filesDir;
-            val file = File(filesDir, "credentials")
-            file.writeText(emailI + "\n" + passwordI + "\n" + scrapperBaseUrlI)
+
+            App.saveCredentialsToFile()
             val transaction = activity?.supportFragmentManager?.beginTransaction()
             transaction?.replace(R.id.fragmentHost, SubjectFragment())
             transaction?.disallowAddToBackStack()

@@ -11,7 +11,7 @@ import io.github.wulkanowy.sdk.pojo.AttendanceSummary
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class DayFragment:Fragment(R.layout.fragment_day) {
+class SettingsFragment:Fragment(R.layout.fragment_day) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

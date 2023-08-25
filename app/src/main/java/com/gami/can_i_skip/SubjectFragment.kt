@@ -3,79 +3,185 @@ package com.gami.can_i_skip
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.Text
 import androidx.fragment.app.Fragment
 import com.gami.can_i_skip.App.Companion.attendance
+import com.gami.can_i_skip.App.Companion.prepareSDK
+import com.gami.can_i_skip.App.Companion.prettyAttendance
 import com.gami.can_i_skip.App.Companion.sdk
-import com.gami.can_i_skip.App.Companion.subjects
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import io.github.wulkanowy.sdk.pojo.AttendanceSummary
 import kotlinx.coroutines.runBlocking
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Divider
+import androidx.compose.material3.FloatingActionButton
+
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.dynamicDarkColorScheme
+
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+import com.gami.can_i_skip.App.Companion.timetable
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
+
+
+import com.google.android.material.color.DynamicColors
+import io.github.wulkanowy.sdk.pojo.Timetable
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+
 
 class SubjectFragment : Fragment(R.layout.fragment_subject) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
         val navbar = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
         navbar.visibility = View.VISIBLE
-        val testingButton = view.findViewById<View>(R.id.testingButton)
+        val composeView =
+            view.findViewById<androidx.compose.ui.platform.ComposeView>(R.id.compose_view)
 
-        testingButton.setOnClickListener {
+
+        composeView.setContent {
+
+            Mdc3Theme {
 
 
-            runBlocking {
-                var prettySubjects = listOf<SubjectPretty>();
-                val subjects = sdk.getSubjects();
-                var attendances: List<AttendanceSummary> = listOf()
-                App.subjects = subjects
+                Column(
+                    modifier = Modifier
 
-                subjects.forEach {
-                    val attendance = sdk.getAttendanceSummary(it.id)
-                    Log.d("ATTENDANCE", "${it.name}, ${attendance}")
-                    App.attendance += attendance
-                    var totalClasses = 0;
-                    var presence = 0;
-                    var absence = 0;
-                    var absenceExcused = 0;
-                    var absenceForSchoolReasons = 0;
-                    var lateness = 0;
-                    var latenessExcused = 0;
-                    var exemption = 0;
-                    attendance.forEach {
-                        totalClasses += it.presence + it.absence + it.absenceExcused + it.absenceForSchoolReasons + it.lateness + it.latenessExcused + it.exemption
-                        presence += it.presence
-                        absence += it.absence
-                        absenceExcused += it.absenceExcused
-                        absenceForSchoolReasons += it.absenceForSchoolReasons
-                        lateness += it.lateness
-                        latenessExcused += it.latenessExcused
-                        exemption += it.exemption
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    prettyAttendance.forEach {
+                        if (it.totalClasses != 0) {
+                            val ratio = it.howCloseToSafetySubject()
+
+                            if (ratio == -1.0) {
+                                ListItem(
+                                    headlineContent = { Text(it.name) },
+                                    supportingContent = {
+                                        Text(
+                                            getString(
+                                                R.string.current_attendance,
+                                                it.getAttendancePercentage().toString()
+                                            ), fontSize = 12.sp
+                                        )
+                                    },
+
+
+                                    trailingContent = {
+                                        Text(
+                                            it.howManyClassesCanSkip().toString(),
+                                            fontSize = 20.sp
+                                        )
+                                    }
+                                )
+                            } else {
+
+                                val color = it.getSafetyColorSubject(ratio)
+
+                                ListItem(
+                                    headlineContent = { Text(it.name) },
+                                    supportingContent = {
+                                        Text(
+                                            getString(
+                                                R.string.current_attendance,
+                                                it.getAttendancePercentage().toString()
+                                            ), fontSize = 12.sp
+                                        )
+                                    },
+
+
+                                    trailingContent = {
+                                        Text(
+                                            it.howManyClassesCanSkip().toString(),
+                                            fontSize = 20.sp,
+                                            color = color,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                )
+                            }
+
+                            HorizontalDivider(modifier = Modifier.padding(12.dp, 0.dp))
+                        }
+
                     }
-                    prettySubjects += SubjectPretty(
-                        it.id,
-                        it.name,
-                        totalClasses,
-                        presence,
-                        absence,
-                        absenceExcused,
-                        absenceForSchoolReasons,
-                        lateness,
-                        latenessExcused,
-                        exemption,
-                        attendance
-                    )
+                    FloatingActionButton(
+                        onClick = { GlobalScope.launch { timetable.build();App.saveTimetableToFile(); } },
+                        shape = MaterialTheme.shapes.small
+                    ) {
+                        Icon(Icons.Filled.Add, "Localized description")
+                    }
 
 
                 }
-                App.prettySubjects = prettySubjects
-                Log.d("ATTENDANCE", "${attendance}")
-                Log.d("SUBJECTS", "${subjects}")
-                Log.d("PRETTY SUBJECTS", "${prettySubjects}")
+
+
             }
 
 
+            /*Column(
+                modifier = Modifier
+
+                    .verticalScroll(rememberScrollState())
+            ) {
+
+
+                prettyAttendance.forEach {
+                    if (it.totalClasses != 0) {
+
+
+                        ListItem(
+
+                            headlineContent = { Text(it.name) },
+                            trailingContent = { Text(it.howManyClassesCanSkip().toString()) },
+
+                            )
+
+                    }
+
+
+                }
+            }*/
+
         }
+
+
+        Log.d(
+            "DATA",
+            App.prettyAttendance.first().toString() + " " + App.prettyAttendance.first()
+                .howManyClassesCanSkip().toString()
+        )
+
+        /*     testingButton.setOnClickListener {
+                 runBlocking {
+                   prepareSDK()
+                     val subjects = sdk.getSubjects()
+                     Log.d("DATA", subjects.toString())
+
+                 }
+
+
+             }*/
 
 
     }

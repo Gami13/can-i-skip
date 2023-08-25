@@ -10,4 +10,9 @@
         android:id="@+id/nav_day"
         android:icon="@drawable/day"
         android:title="@string/nav_day" />
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/settings"
+        android:title="@string/nav_settings" />
+
 </menu>

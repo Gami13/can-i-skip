@@ -1,20 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.Caniskip" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <style name="Theme.Caniskip" parent="Theme.Material3.DynamicColors.DayNight">
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.Caniskip" parent="Base.Theme.Caniskip" />
 
-    <style name="Theme.Caniskip.DarkActionBar" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/mainLight</item>
-        <item name="colorPrimaryDark">@color/main</item>
-        <item name="colorAccent">@color/text</item>
-    </style>
 
-    <style name="dropDownMenu" parent="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu">
-        <item name="boxStrokeColor">@color/focus_tint_list</item>
-    </style>
+
 </resources>

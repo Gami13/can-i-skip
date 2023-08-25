@@ -6,34 +6,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    android:background="@color/depth0"
+
     tools:context=".MainActivity">
 
 
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="290dp"
-        android:layout_height="100dp"
-        android:text="TEST2"
-        android:textAlignment="center"
-        android:textColor="@color/mainLight"
-        android:textSize="48sp"
-        android:textStyle="bold"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/testingButton"
-        android:layout_width="265dp"
-        android:layout_height="127dp"
-        android:text="TEST"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

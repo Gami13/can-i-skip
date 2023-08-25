@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    android:background="@color/depth0"
+
     tools:context=".MainActivity">
 
 
@@ -17,7 +17,7 @@
         android:layout_height="67dp"
 
         android:layout_marginBottom="72dp"
-        android:shape="oval"
+
 
 
         android:text="@string/log_in"
@@ -26,55 +26,56 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:rippleColor="@color/mainLight" />
+         />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textFieldEmail"
         android:layout_width="320dp"
         android:layout_height="90dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
 
         android:layout_marginBottom="28dp"
         android:hint="@string/email_prompt"
 
 
 
-        android:textColorHint="@color/material_dynamic_neutral60"
-        app:boxBackgroundColor="@color/depth1"
+
+
         app:boxBackgroundMode="filled"
 
 
 
 
-        app:hintTextColor="@color/material_dynamic_neutral60"
         app:layout_constraintBottom_toTopOf="@+id/textFieldPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
         app:startIconDrawable="@drawable/mail"
-        app:startIconTint="@color/material_dynamic_neutral60">
+       >
 
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/text" />
+            />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
         android:id="@+id/textFieldPassword"
         android:layout_width="320dp"
         android:layout_height="90dp"
 
         android:layout_marginBottom="28dp"
         android:hint="@string/password_prompt"
-        android:textColorHint="@color/material_dynamic_neutral60"
-        app:boxBackgroundColor="@color/depth1"
+
+
 
 
         app:boxBackgroundMode="filled"
-        app:hintTextColor="@color/material_dynamic_neutral60"
+
         app:layout_constraintBottom_toTopOf="@+id/baseUrlList"
 
 
@@ -83,9 +84,9 @@
         app:layout_constraintStart_toStartOf="parent"
 
         app:passwordToggleEnabled="true"
-        app:passwordToggleTint="@color/material_dynamic_neutral60"
+
         app:startIconDrawable="@drawable/password"
-        app:startIconTint="@color/material_dynamic_neutral60">
+        >
 
 
         <com.google.android.material.textfield.TextInputEditText
@@ -93,13 +94,13 @@
             android:inputType="textPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/text" />
+           />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/baseUrlList"
-        style="@style/dropDownMenu"
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
         android:layout_width="320dp"
         android:layout_height="90dp"
 
@@ -110,11 +111,9 @@
         app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintStart_toStartOf="parent"
         app:startIconDrawable="@drawable/link"
-        app:startIconTint="@color/material_dynamic_neutral60"
-        app:boxBackgroundColor="@color/depth1"
-        app:hintTextColor="@color/material_dynamic_neutral60"
-        android:textColorHint="@color/material_dynamic_neutral60"
-        app:endIconTint="@color/material_dynamic_neutral60"
+
+
+
 
 
 
@@ -127,12 +126,12 @@
             android:id="@+id/autoCompleteTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@null"
+
             android:inputType="none"
-            android:textColor="@color/text"
 
 
-            android:textColorHint="@color/material_dynamic_neutral60" />
+
+             />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -142,7 +141,7 @@
         android:layout_height="100dp"
         android:text="@string/app_name"
         android:textAlignment="center"
-        android:textColor="@color/mainLight"
+
         android:textSize="48sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/textFieldEmail"

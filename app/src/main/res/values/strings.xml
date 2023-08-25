@@ -10,8 +10,28 @@
     <!-- Strings related to login -->
     <string name="nav_day">By Day</string>
     <string name="nav_subject">By Subject</string>
+    <string name="nav_settings">Settings</string>
 
     <string name="baseurl_standard">Standard</string>
     <string name="baseurl_custom_suffix">Custom domain suffix</string>
     <string name="baseurl_prompt">Choose your login URL</string>
+
+
+    <string name="topbar_by_day">Able to skip by day</string>
+    <string name="topbar_by_subject">Able to skip by subject</string>
+    <string name="topbar_login">Log In</string>
+    <string name="topbar_settings">Settings</string>
+
+    <string name="current_attendance">Currently: %1$s%%</string>
+
+
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+
+
+    <string name="current_attendance_rate">Current Attendance: %1$s%%</string>
+
 </resources>

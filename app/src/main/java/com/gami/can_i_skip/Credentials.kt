@@ -4,14 +4,15 @@ import kotlinx.serialization.Serializable
 import java.time.Month
 
 @Serializable
-data class AttendanceMonth(
-    val month: Month,
-    val presence: Int,
-    val absence: Int,
-    val absenceExcused: Int,
-    val absenceForSchoolReasons: Int,
-    val lateness: Int,
-    val latenessExcused: Int,
-    val exemption: Int,
+data class Credentials(
+val email : String,
+val password : String,
+    val scrapperBaseUrl : String,
+    val loginType : String,
+    val symbol:String,
+    val schoolSymbol:String,
+    val studentId:Int,
+    val diaryId:Int,
+
 )
 
