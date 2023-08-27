@@ -56,9 +56,10 @@ class SubjectFragment : Fragment(R.layout.fragment_subject) {
         super.onViewCreated(view, savedInstanceState)
         val navbar = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
         navbar.visibility = View.VISIBLE
+        App.topBar?.visibility = View.VISIBLE
+        
         val composeView =
             view.findViewById<androidx.compose.ui.platform.ComposeView>(R.id.compose_view)
-
 
         composeView.setContent {
 
@@ -125,12 +126,7 @@ class SubjectFragment : Fragment(R.layout.fragment_subject) {
                         }
 
                     }
-                    FloatingActionButton(
-                        onClick = { GlobalScope.launch { timetable.build();App.saveTimetableToFile(); } },
-                        shape = MaterialTheme.shapes.small
-                    ) {
-                        Icon(Icons.Filled.Add, "Localized description")
-                    }
+
 
 
                 }
@@ -139,29 +135,7 @@ class SubjectFragment : Fragment(R.layout.fragment_subject) {
             }
 
 
-            /*Column(
-                modifier = Modifier
 
-                    .verticalScroll(rememberScrollState())
-            ) {
-
-
-                prettyAttendance.forEach {
-                    if (it.totalClasses != 0) {
-
-
-                        ListItem(
-
-                            headlineContent = { Text(it.name) },
-                            trailingContent = { Text(it.howManyClassesCanSkip().toString()) },
-
-                            )
-
-                    }
-
-
-                }
-            }*/
 
         }
 
@@ -171,17 +145,6 @@ class SubjectFragment : Fragment(R.layout.fragment_subject) {
             App.prettyAttendance.first().toString() + " " + App.prettyAttendance.first()
                 .howManyClassesCanSkip().toString()
         )
-
-        /*     testingButton.setOnClickListener {
-                 runBlocking {
-                   prepareSDK()
-                     val subjects = sdk.getSubjects()
-                     Log.d("DATA", subjects.toString())
-
-                 }
-
-
-             }*/
 
 
     }

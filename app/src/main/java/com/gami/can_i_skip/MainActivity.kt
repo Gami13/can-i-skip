@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.gami.can_i_skip.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.security.KeyStore
@@ -30,13 +31,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-        App.loadCredentialsFromFile()
-        App.loadAttendanceFromFile()
-        App.loadTimetableFromFile()
-        App.sortAttendanceAlphabetically()
-        Log.d("Timetable" , App.timetable.toString())
+        App.loadEverythingFromFile()
+        Log.d("Timetable", App.timetable.toString())
 
-        App.topBar = findViewById(R.id.topAppBar)
         val navMenu = findViewById<BottomNavigationView>(R.id.bottom_navigation)
 
         val settingsFragment = SettingsFragment();
@@ -47,10 +44,36 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        replaceFragment(loginFragment, getString(R.string.topbar_login))
+        if (App.credentials.email != "") {
+            GlobalScope.launch {
+                App.refresh()
+            }
 
 
+            replaceFragment(subjectFragment, getString(R.string.topbar_by_subject))
 
+        } else {
+
+            replaceFragment(loginFragment, getString(R.string.topbar_login))
+        }
+
+
+        val topBar =
+            findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.topAppBar)
+
+        topBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.refresh -> {
+                    GlobalScope.launch {
+                        App.refresh()
+                    }
+                    true
+                }
+
+                else -> false
+            }
+        }
+        App.topBar = topBar
 
 
         navMenu.setOnItemSelectedListener {
@@ -68,6 +91,7 @@ class MainActivity : AppCompatActivity() {
 
                     true
                 }
+
                 R.id.nav_settings -> {
                     replaceFragment(settingsFragment, getString(R.string.topbar_settings))
                     true

@@ -11,15 +11,14 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.gami.can_i_skip.App.Companion.sdk
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import io.github.wulkanowy.sdk.Sdk
 import io.github.wulkanowy.sdk.pojo.RegisterStudent
+import io.github.wulkanowy.sdk.pojo.RegisterUnit
 import io.github.wulkanowy.sdk.pojo.RegisterUser
 import io.github.wulkanowy.sdk.scrapper.login.BadCredentialsException
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import java.io.File
-import com.gami.can_i_skip.App.Companion.sdk
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
@@ -29,17 +28,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         super.onViewCreated(view, savedInstanceState)
 
 
+        App.topBar?.visibility = View.GONE
+        var isLoginStarted = false;
 
-
-        if (App.credentials.email != "") {
-
-            val transaction = activity?.supportFragmentManager?.beginTransaction()
-            transaction?.replace(R.id.fragmentHost, SubjectFragment())
-            transaction?.disallowAddToBackStack()
-            transaction?.commit()
-            App.topBar?.title = getString(R.string.topbar_by_subject)
-            return
-        }
 
         val navbar = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
         navbar.visibility = View.GONE
@@ -53,14 +44,17 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
 
         logInButton.setOnClickListener {
-
+            if (isLoginStarted) {
+                Toast.makeText(view.context, getString(R.string.please_wait), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
             val inputEmail = view.findViewById<EditText>(R.id.inputEmail).text.toString();
             val inputPassword = view.findViewById<EditText>(R.id.inputPassword).text.toString();
             val inputBaseUrl =
                 view.findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView).text.toString();
             if (inputEmail.isEmpty() || inputPassword.isEmpty() || inputBaseUrl.isEmpty()) {
-                Toast.makeText(view.context, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(view.context, getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -73,9 +67,15 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
 
 
-            runBlocking {
-
-                launch { loginUser(inputEmail, inputPassword, inputBaseUrlValue, view) }
+            GlobalScope.launch {
+                isLoginStarted = true;
+                /*  Doesnt work in API 24      logInButton.isClickable = false;
+                        logInButton.setText(R.string.please_wait);*/
+                var loginResult = loginUser(inputEmail, inputPassword, inputBaseUrlValue, view)/*   logInButton.isClickable = true;
+                   logInButton.setText(R.string.log_in);*/
+                if (loginResult) {
+                    isLoginStarted = false;
+                }
             }
 
             Log.d("nut", "deez nuts");
@@ -85,31 +85,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     }
 
     suspend fun loginUser(
-        emailI: String,
-        passwordI: String,
-        scrapperBaseUrlI: String,
-        view: View
+        emailI: String, passwordI: String, scrapperBaseUrlI: String, view: View
     ): Boolean {
-        /*   DONT KNOW WHY DOESNT WORK
-             val logInButton = view.findViewById<Button>(R.id.log_in_button)
-             Log.d("TEST", "logging")
-             logInButton.isClickable = false;
-             logInButton.setText(R.string.please_wait);
 
-             val colorFrom = view.context.getColor(R.color.main)
-             val colorTo = view.context.getColor(R.color.mainDisabled)
-             val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
-             colorAnimation.duration = 250 // milliseconds
-
-             colorAnimation.addUpdateListener { animator -> logInButton.setBackgroundColor(animator.animatedValue as Int) }
-             colorAnimation.start()
-
-             logInButton.setBackgroundColor(
-                 ContextCompat.getColor(
-                     view.context,
-                     R.color.mainDisabled
-                 )
-             )*/
         try {
             val user: RegisterUser = sdk.getUserSubjectsFromScrapper(
                 email = emailI,
@@ -119,13 +97,73 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 )
 
 
-            val registerSymbol = user.symbols
-                .filter { it.schools.isNotEmpty() }
+            val registerSymbol = user.symbols.filter { it.schools.isNotEmpty() }
                 .first { it.schools.all { school -> school.subjects.isNotEmpty() } }
 
-            val registerUnit = registerSymbol.schools.first()
-            val registerStudent = registerUnit.subjects.filterIsInstance<RegisterStudent>().first()
 
+            val registerUnits = registerSymbol.schools
+            val registerUnitNamesArray = registerUnits.map { it.schoolName }
+            var registerUnit: RegisterUnit = registerUnits.first();
+
+            var didSelectStudent = false;
+            var didSelectSchool = false;
+            if (registerUnits.size > 1) {
+                didSelectSchool = false;
+
+                val builder = AlertDialog.Builder(view.context)
+                builder.setTitle(getString(R.string.choose_school))
+                    .setItems(
+                        registerUnitNamesArray.toTypedArray(),
+                        DialogInterface.OnClickListener { dialog, which ->
+
+                            registerUnit = registerUnits[which]
+                            didSelectSchool = true;
+
+                        })
+
+
+                requireActivity().runOnUiThread {
+
+                    builder.create().show()
+                }
+            } else {
+                didSelectSchool = true;
+            }
+            while (!didSelectSchool) {
+
+            }
+
+            val registerStudents = registerUnit.subjects.filterIsInstance<RegisterStudent>()
+            val registerStudentNamesArray = registerStudents.map { it.studentName }
+            var registerStudent: RegisterStudent = registerStudents.first();
+            if (registerStudents.size > 1) {
+                didSelectStudent = false;
+                val builder = AlertDialog.Builder(view.context)
+                builder.setTitle(getString(R.string.choose_student))
+                    .setItems(
+                        registerStudentNamesArray.toTypedArray(),
+                        DialogInterface.OnClickListener { dialog, which ->
+
+                            registerStudent = registerStudents[which]
+                            didSelectStudent = true;
+
+                        })
+
+
+                requireActivity().runOnUiThread {
+
+                    builder.create().show()
+                }
+            } else {
+                didSelectStudent = true;
+            }
+
+
+
+            while (!didSelectStudent) {
+
+
+            }
             val semester = registerStudent.semesters.first()
             App.credentials = Credentials(
                 email = emailI,
@@ -141,25 +179,26 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
 
 
-            Log.d("SDK", "Schoold id: ${registerUnit.schoolId}")
-            Log.d("SDK", "Student id: ${registerStudent.studentId}")
-
 
             App.saveCredentialsToFile()
+            App.refresh()
+            App.timetable.build()
+            App.saveTimetableToFile()
             val transaction = activity?.supportFragmentManager?.beginTransaction()
             transaction?.replace(R.id.fragmentHost, SubjectFragment())
             transaction?.disallowAddToBackStack()
             transaction?.commit()
+
             return true
         } catch (e: BadCredentialsException) {
 
-            AlertDialog.Builder(view.context)
-                .setTitle(R.string.login_failed)
+            AlertDialog.Builder(view.context).setTitle(R.string.login_failed)
                 .setMessage(R.string.login_failed_message)
                 .setNeutralButton(android.R.string.ok, null)
 
                 .show()
             Toast.makeText(view.context, R.string.login_failed, Toast.LENGTH_SHORT).show()
+
             return false
         }
 

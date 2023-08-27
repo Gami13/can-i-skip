@@ -57,6 +57,7 @@ class DayFragment : Fragment(R.layout.fragment_subject) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val navbar = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
+        App.topBar?.visibility = View.VISIBLE
         navbar.visibility = View.VISIBLE
         val composeView =
             view.findViewById<androidx.compose.ui.platform.ComposeView>(R.id.compose_view)
@@ -187,12 +188,6 @@ class DayFragment : Fragment(R.layout.fragment_subject) {
 
 
 
-                    FloatingActionButton(
-                        onClick = { GlobalScope.launch { timetable.build();App.saveTimetableToFile();  } },
-                        shape = MaterialTheme.shapes.small
-                    ) {
-                        Icon(Icons.Filled.Add, "Localized description")
-                    }
 
 
                 }

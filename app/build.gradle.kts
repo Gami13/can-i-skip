@@ -78,6 +78,7 @@ dependencies {
         exclude(group = "androidx.compose.material3", module = "material3")
     }
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+    implementation("com.github.skydoves:colorpicker-compose:1.0.4")
 
 
 }

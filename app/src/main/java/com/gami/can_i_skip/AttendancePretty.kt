@@ -1,5 +1,6 @@
 package com.gami.can_i_skip
 
+import android.util.Range
 import androidx.compose.ui.graphics.Color
 import kotlinx.serialization.Serializable
 import kotlin.math.round
@@ -30,6 +31,7 @@ data class AttendancePretty(
         return (presenceTotal.toDouble() / total.toDouble() * 100_00).roundToInt()/100.0
     }
     fun howManyClassesCanSkip(): Int {
+        if (App.targetAttendance == 0.0) return 99999
         var skippable = ((presence.toDouble() / App.targetAttendance) - totalClasses).toInt()
         if(skippable < 0) skippable = 0
         return skippable
@@ -63,6 +65,7 @@ data class AttendancePretty(
         if(index > amountOfSteps) index = amountOfSteps
         return App.steps[index-1]
     }
+
 
 
 

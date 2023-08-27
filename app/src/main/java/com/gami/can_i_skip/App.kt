@@ -2,11 +2,15 @@ package com.gami.can_i_skip
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
+import android.util.Range
 import androidx.compose.ui.graphics.Color
 
 import io.github.wulkanowy.sdk.Sdk
 import io.github.wulkanowy.sdk.pojo.AttendanceSummary
 import io.github.wulkanowy.sdk.pojo.Subject
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -30,6 +34,7 @@ class App : Application() {
         var subjects: List<Subject> = listOf()
         var attendance: List<AttendanceSummary> = listOf()
         var prettyAttendance: List<AttendancePretty> = listOf()
+
         /*add option to change*/
         var targetAttendance = 0.60
         /*add option to change*/
@@ -37,14 +42,103 @@ class App : Application() {
         var safetyAfterWeeks = 2
 
         /*add option to change*/
-        var steps :Array<Color> = arrayOf(
-           Color(210,2,2),
-            Color(183,96,6),
-            Color(154,156,10),
-            Color(69,131,12),
-            Color(13,107,16),
+        var steps: Array<Color> = arrayOf(
+            Color(210, 2, 2),
+            Color(183, 96, 6),
+            Color(154, 156, 10),
+            Color(69, 131, 12),
+            Color(13, 107, 16),
         )
         var timetable: com.gami.can_i_skip.Timetable = com.gami.can_i_skip.Timetable()
+
+        suspend fun refresh() {
+
+            updateAttendance()
+            saveAttendanceToFile()
+
+            Log.d("REFRESH", "REFRESHED")
+
+        }
+
+        fun logOut()
+        {
+            val filesDir = App.context?.filesDir;
+            val file = File(filesDir, "credentials")
+            file.delete()
+            val file2 = File(filesDir, "subjectsPretty")
+            file2.delete()
+            val file3 = File(filesDir, "timetable")
+            file3.delete()
+            val file4 = File(filesDir, "steps")
+            file4.delete()
+            val file5 = File(filesDir, "prefs")
+            file5.delete()
+
+        }
+
+        fun savePreferences() {
+            val prefs = Preferences(targetAttendance, safetyAfterWeeks)
+            val filesDir = App.context?.filesDir;
+            val file = File(filesDir, "prefs")
+
+            file.writeText(Json.encodeToString(prefs))
+
+        }
+
+        fun loadPreferences() {
+            val filesDir = App.context?.filesDir;
+            val file = File(filesDir, "prefs")
+            if (file.exists()) {
+                val prefs = Json.decodeFromString<Preferences>(file.readText())
+                App.targetAttendance = prefs.targetAttendance
+                App.safetyAfterWeeks = prefs.safetyAfterWeeks
+            }
+        }
+
+        fun saveEverythingToFile() {
+            saveCredentialsToFile()
+            saveAttendanceToFile()
+            saveTimetableToFile()
+            saveStepsToFile()
+            savePreferences()
+        }
+
+        fun loadEverythingFromFile() {
+            loadCredentialsFromFile()
+            loadAttendanceFromFile()
+            loadTimetableFromFile()
+            loadStepsFromFile()
+            loadPreferences()
+            if (prettyAttendance.size > 0) {
+
+                sortAttendanceAlphabetically()
+            }
+        }
+
+        fun saveStepsToFile() {
+            val filesDir = App.context?.filesDir;
+            val file = File(filesDir, "steps")
+            var saveableSteps = arrayOf<SerializableColor>()
+            App.steps.forEach {
+                saveableSteps += SerializableColor(it.red, it.green, it.blue, it.alpha)
+            }
+
+
+            file.writeText(Json.encodeToString(saveableSteps))
+        }
+
+        fun loadStepsFromFile() {
+            val filesDir = App.context?.filesDir;
+            val file = File(filesDir, "steps")
+            if (file.exists()) {
+                val steps = Json.decodeFromString<Array<SerializableColor>>(file.readText())
+                var loadedSteps = arrayOf<Color>()
+                steps.forEach {
+                    loadedSteps += Color(it.red, it.green, it.blue, it.alpha)
+                }
+                App.steps = loadedSteps
+            }
+        }
 
         fun sortAttendanceAlphabetically() {
             /*"Wszystkie should be at the top*/
@@ -56,6 +150,7 @@ class App : Application() {
 
             App.saveAttendanceToFile()
         }
+
         fun saveTimetableToFile() {
 
             val filesDir = App.context?.filesDir;
@@ -63,14 +158,17 @@ class App : Application() {
 
             file.writeText(Json.encodeToString(App.timetable))
         }
-        fun loadTimetableFromFile(){
+
+        fun loadTimetableFromFile() {
             val filesDir = App.context?.filesDir;
             val file = File(filesDir, "timetable")
             if (file.exists()) {
-                val timetable = Json.decodeFromString<com.gami.can_i_skip.Timetable>(file.readText())
+                val timetable =
+                    Json.decodeFromString<com.gami.can_i_skip.Timetable>(file.readText())
                 App.timetable = timetable
             }
         }
+
         fun saveAttendanceToFile() {
 
             val filesDir = App.context?.filesDir;
@@ -87,12 +185,25 @@ class App : Application() {
                 App.prettyAttendance = subjectsPretty
             }
         }
+        fun round(value:Double):Double{
+            return (value*100.0).toInt()/100.0
+        }
 
         fun saveCredentialsToFile() {
             val filesDir = App.context?.filesDir;
             val file = File(filesDir, "credentials")
 
             file.writeText(Json.encodeToString(App.credentials))
+
+
+        }
+        fun getStepRange(stepIdx:Int): Range<Double> {
+            val amountOfSteps = App.steps.size
+            val step = 1.0/amountOfSteps
+
+
+            return Range(round(stepIdx*step),round((stepIdx+1)*step) )
+
 
 
         }
@@ -123,25 +234,26 @@ class App : Application() {
         }
 
 
-
-        fun getPreviousMonday(monday: LocalDate):LocalDate {
+        fun getPreviousMonday(monday: LocalDate): LocalDate {
             return monday.minusDays(7)
         }
-        fun getLastMonday():LocalDate {
 
-            val lastFriday = getLastFriday()
-            return lastFriday.minusDays(4)
+        fun getLastMonday(): LocalDate {
+
+            return LocalDate.now(ZoneId.of("Europe/Warsaw"))
+                .with(TemporalAdjusters.previous(DayOfWeek.MONDAY))
+
 
         }
 
-        fun getLastFriday():LocalDate {
+        fun getLastFriday(): LocalDate {
 
-                return LocalDate.now(ZoneId.of("Europe/Warsaw")).with(TemporalAdjusters.previous(DayOfWeek.FRIDAY))
+
+            return getLastMonday().plusDays(4)
         }
 
         suspend fun updateAttendance() {
-            if(!isSdkPrepared)
-            {
+            if (!isSdkPrepared) {
                 prepareSDK()
             }
             var prettyAttendance = listOf<AttendancePretty>();
@@ -202,7 +314,7 @@ class App : Application() {
             }
             App.prettyAttendance = prettyAttendance
 
-            App.saveAttendanceToFile()
+            saveAttendanceToFile()
         }
 
 

@@ -5,7 +5,7 @@
     <string name="log_in">Log In</string>
     <string name="please_wait">Please Wait…</string>
     <string name="login_failed">Login Failed</string>
-<string name="login_failed_message">Please check your credentials and try again.</string>
+    <string name="login_failed_message">Please check your credentials and try again.</string>
 
     <!-- Strings related to login -->
     <string name="nav_day">By Day</string>
@@ -34,4 +34,33 @@
 
     <string name="current_attendance_rate">Current Attendance: %1$s%%</string>
 
+    <string name="refresh">Refresh</string>
+    <string name="fill_all_fields">Please fill in all fields</string>
+
+    <string name="choose_school">Choose your school</string>
+    <string name="choose_student">Choose your student</string>
+
+    <string name="set_safety">Amount of weeks required for safety</string>
+    <string name="set_safety_desc">This is used for calculating the proper step color for the skips, the provided amount of weeks determine what\'s considered 100%%.</string>
+
+    <string name="set_attendance">Target attendance</string>
+    <string name="set_attendance_desc">Your targeted attendance, used for calculating how many classes you can skip..</string>
+
+    <string name="set_steps">Amount of steps</string>
+    <string name="set_steps_desc">Customize the amount of color steps used for the skips.</string>
+    <string name="set_step">Step %1$s</string>
+
+    <string name="set_timetable">Timetable</string>
+    <string name="set_timetable_desc">Rebuilding a timetable is a delicate process. Do it only if you have to. Doesn\'t require saving.</string>
+    <string name="rebuild">Rebuild</string>
+
+    <string name="log_out">Log out</string>
+    <string name="log_out_desc">This will log you out of the app.</string>
+
+    <string name="save">Save</string>
+
+    <string name="pick_color">Pick the color</string>
+
+    <string name="done">Done</string>
+    <string name="cancel">Cancel</string>
 </resources>

@@ -1,3 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Can I Skip?</string>
+    <string name="nav_day">Na dzień</string>
+    <string name="nav_subject">Na przedmiot</string>
+    <string name="nav_settings">Ustawienia</string>
+    <string name="baseurl_standard">Standardowy</string>
+    <string name="email_prompt">E-Mail:</string>
+    <string name="password_prompt">Hasło:</string>
+    <string name="log_in">Zaloguj się</string>
+    <string name="please_wait">Prosze czekać</string>
+    <string name="login_failed">Logowanie nie powiodło się</string>
+    <string name="login_failed_message">Sprawdź swoje dane i spróbuj ponownie</string>
+    <string name="baseurl_custom_suffix">Własna końcówka domeny</string>
+    <string name="baseurl_prompt">Wybierz link logowania</string>
+    <string name="topbar_by_day">Ze względu na dzień</string>
+    <string name="topbar_by_subject">Ze względu na przedmiot</string>
+    <string name="topbar_login">Zaloguj się</string>
+    <string name="topbar_settings">Ustawienia</string>
+    <string name="current_attendance">Aktualnie %1$s%%</string>
+    <string name="monday">Poniedziałek</string>
+    <string name="tuesday">Wtorek</string>
+    <string name="wednesday">Środa</string>
+    <string name="thursday">Czwartek</string>
+    <string name="friday">Piątek</string>
+    <string name="current_attendance_rate">Aktualna obecność: %1$s%%</string>
+    <string name="refresh">Odśwież</string>
+    <string name="fill_all_fields">Proszę uzupełnić wszystkie pola</string>
+    <string name="choose_school">Wybierz szkołe</string>
+    <string name="choose_student">Wybierz ucznia</string>
+    <string name="set_safety">Ile tygodni potrzeba do bezpieczeństwa</string>
+    <string name="set_safety_desc">Używane do obliczenia odpowiedniego koloru ilości lekcji możliwych do ominięcia, podana ilość stanowi 100%% bezpieczeństwa</string>
+    <string name="set_attendance">Celowa frekwencja</string>
+    <string name="set_attendance_desc">Twoja celowa frekwencja, używana do obliczenia ile lekcji możesz ominąć.</string>
+    <string name="set_steps">Ilość progów</string>
+    <string name="set_steps_desc">Dostosuj ilość progów używanych do obliczania kolorów.</string>
+    <string name="set_step">Próg %1$s</string>
+    <string name="set_timetable">Plan lekcji</string>
+    <string name="set_timetable_desc">Odbudowywanie planu lekcji jest delikatnym procesem. Zrób to tylko gdy jest to konieczne, Nie wymaga zapisywania.</string>
+    <string name="rebuild">Odbuduj</string>
+    <string name="log_out">Wyloguj się</string>
+    <string name="log_out_desc">Zrobienie tego wyloguje cię z aplikacji.</string>
+    <string name="save">Zapisz</string>
+    <string name="pick_color">Wybierz kolor</string>
+    <string name="done">Zrobione</string>
+    <string name="cancel">Anuluj</string>
+
 </resources>
