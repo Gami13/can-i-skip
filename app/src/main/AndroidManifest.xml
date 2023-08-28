@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,7 +14,9 @@
         android:theme="@style/Theme.Caniskip"
         tools:targetApi="31"
         android:name=".App">
-
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5672265312556699~5630562282"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -24,5 +27,6 @@
             </intent-filter>
         </activity>
     </application>
+
 
 </manifest>

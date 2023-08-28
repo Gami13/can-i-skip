@@ -34,6 +34,7 @@ class App : Application() {
         var subjects: List<Subject> = listOf()
         var attendance: List<AttendanceSummary> = listOf()
         var prettyAttendance: List<AttendancePretty> = listOf()
+        var lastAdTimetsamp = 0L
 
         /*add option to change*/
         var targetAttendance = 0.60
@@ -77,7 +78,7 @@ class App : Application() {
         }
 
         fun savePreferences() {
-            val prefs = Preferences(targetAttendance, safetyAfterWeeks)
+            val prefs = Preferences(targetAttendance, safetyAfterWeeks, lastAdTimetsamp)
             val filesDir = App.context?.filesDir;
             val file = File(filesDir, "prefs")
 
@@ -92,6 +93,7 @@ class App : Application() {
                 val prefs = Json.decodeFromString<Preferences>(file.readText())
                 App.targetAttendance = prefs.targetAttendance
                 App.safetyAfterWeeks = prefs.safetyAfterWeeks
+                App.lastAdTimetsamp = prefs.adTimestap
             }
         }
 
