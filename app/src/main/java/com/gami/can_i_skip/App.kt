@@ -2,8 +2,10 @@ package com.gami.can_i_skip
 
 import android.app.Application
 import android.content.Context
+import android.os.Looper
 import android.util.Log
 import android.util.Range
+import android.widget.Toast
 import androidx.compose.ui.graphics.Color
 
 import io.github.wulkanowy.sdk.Sdk
@@ -53,16 +55,49 @@ class App : Application() {
         var timetable: com.gami.can_i_skip.Timetable = com.gami.can_i_skip.Timetable()
 
         suspend fun refresh() {
+            try {
+                if (Looper.myLooper() == null) {
+                    Looper.prepare()
 
-            updateAttendance()
-            saveAttendanceToFile()
+                }
+                Toast.makeText(
+                    context,
+                    context?.getString(R.string.refreshing),
+                    Toast.LENGTH_SHORT
+                ).show()
+                updateAttendance()
+                saveAttendanceToFile()
+                Toast.makeText(
+                    context,
+                    context?.getString(R.string.refreshed),
+                    Toast.LENGTH_SHORT
+                ).show()
+                Log.d("REFRESH", "REFRESHED")
 
-            Log.d("REFRESH", "REFRESHED")
+            } catch (e: Exception) {
+                Log.d("REFRESH", "FAILED")
+
+
+
+
+                if (Looper.myLooper() == null) {
+                    Looper.prepare()
+
+                }
+                Toast.makeText(
+                    context,
+                    context?.getString(R.string.no_internet),
+                    Toast.LENGTH_SHORT
+                ).show()
+
+
+            }
+
+
 
         }
 
-        fun logOut()
-        {
+        fun logOut() {
             val filesDir = App.context?.filesDir;
             val file = File(filesDir, "credentials")
             file.delete()
@@ -187,8 +222,9 @@ class App : Application() {
                 App.prettyAttendance = subjectsPretty
             }
         }
-        fun round(value:Double):Double{
-            return (value*100.0).toInt()/100.0
+
+        fun round(value: Double): Double {
+            return (value * 100.0).toInt() / 100.0
         }
 
         fun saveCredentialsToFile() {
@@ -199,13 +235,13 @@ class App : Application() {
 
 
         }
-        fun getStepRange(stepIdx:Int): Range<Double> {
+
+        fun getStepRange(stepIdx: Int): Range<Double> {
             val amountOfSteps = App.steps.size
-            val step = 1.0/amountOfSteps
+            val step = 1.0 / amountOfSteps
 
 
-            return Range(round(stepIdx*step),round((stepIdx+1)*step) )
-
+            return Range(round(stepIdx * step), round((stepIdx + 1) * step))
 
 
         }

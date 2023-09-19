@@ -63,4 +63,8 @@
 
     <string name="done">Done</string>
     <string name="cancel">Cancel</string>
+    <string name="no_internet">No internet connection</string>
+    <string name="refreshing">Refreshing</string>
+    <string name="refreshed">Refreshed</string>
+
 </resources>

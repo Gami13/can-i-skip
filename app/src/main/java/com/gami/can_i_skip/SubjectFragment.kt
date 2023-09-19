@@ -14,6 +14,7 @@ import com.gami.can_i_skip.App.Companion.prepareSDK
 import com.gami.can_i_skip.App.Companion.prettyAttendance
 import com.gami.can_i_skip.App.Companion.sdk
 import com.google.android.material.bottomnavigation.BottomNavigationView
+
 import io.github.wulkanowy.sdk.pojo.AttendanceSummary
 import kotlinx.coroutines.runBlocking
 import androidx.compose.foundation.layout.Column
@@ -70,6 +71,7 @@ class SubjectFragment : Fragment(R.layout.fragment_subject) {
                     modifier = Modifier
 
                         .verticalScroll(rememberScrollState())
+
                 ) {
                     prettyAttendance.forEach {
                         if (it.totalClasses != 0) {
