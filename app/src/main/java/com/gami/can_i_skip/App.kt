@@ -1,5 +1,6 @@
 package com.gami.can_i_skip
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.os.Looper
@@ -11,8 +12,6 @@ import androidx.compose.ui.graphics.Color
 import io.github.wulkanowy.sdk.Sdk
 import io.github.wulkanowy.sdk.pojo.AttendanceSummary
 import io.github.wulkanowy.sdk.pojo.Subject
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -28,22 +27,19 @@ class App : Application() {
 
     companion object {
 
+        @SuppressLint("StaticFieldLeak")
         var context: Context? = null
         var sdk = Sdk()
         var isSdkPrepared = false
+
+        @SuppressLint("StaticFieldLeak")
         var topBar: com.google.android.material.appbar.MaterialToolbar? = null
         var credentials: Credentials = Credentials("", "", "", "", "", "", 0, 0)
         var subjects: List<Subject> = listOf()
         var attendance: List<AttendanceSummary> = listOf()
         var prettyAttendance: List<AttendancePretty> = listOf()
-        var lastAdTimetsamp = 0L
 
-        /*add option to change*/
-        var targetAttendance = 0.60
-        /*add option to change*/
-
-        var safetyAfterWeeks = 2
-
+        var preferences: Preferences = Preferences(0.60, 2, 0, false, listOf())
         /*add option to change*/
         var steps: Array<Color> = arrayOf(
             Color(210, 2, 2),
@@ -52,7 +48,7 @@ class App : Application() {
             Color(69, 131, 12),
             Color(13, 107, 16),
         )
-        var timetable: com.gami.can_i_skip.Timetable = com.gami.can_i_skip.Timetable()
+        var timetable: Timetable = Timetable()
 
         suspend fun refresh() {
             try {
@@ -67,6 +63,10 @@ class App : Application() {
                 ).show()
                 updateAttendance()
                 saveAttendanceToFile()
+                if (Looper.myLooper() == null) {
+                    Looper.prepare()
+
+                }
                 Toast.makeText(
                     context,
                     context?.getString(R.string.refreshed),
@@ -75,7 +75,7 @@ class App : Application() {
                 Log.d("REFRESH", "REFRESHED")
 
             } catch (e: Exception) {
-                Log.d("REFRESH", "FAILED")
+                Log.d("REFRESH", "FAILED" + e.toString())
 
 
 
@@ -94,11 +94,10 @@ class App : Application() {
             }
 
 
-
         }
 
         fun logOut() {
-            val filesDir = App.context?.filesDir;
+            val filesDir = context?.filesDir
             val file = File(filesDir, "credentials")
             file.delete()
             val file2 = File(filesDir, "subjectsPretty")
@@ -113,22 +112,28 @@ class App : Application() {
         }
 
         fun savePreferences() {
-            val prefs = Preferences(targetAttendance, safetyAfterWeeks, lastAdTimetsamp)
-            val filesDir = App.context?.filesDir;
+
+            val filesDir = context?.filesDir
             val file = File(filesDir, "prefs")
 
-            file.writeText(Json.encodeToString(prefs))
+            file.writeText(Json.encodeToString(preferences))
 
         }
 
         fun loadPreferences() {
-            val filesDir = App.context?.filesDir;
+            val filesDir = context?.filesDir
             val file = File(filesDir, "prefs")
             if (file.exists()) {
+                try{
                 val prefs = Json.decodeFromString<Preferences>(file.readText())
-                App.targetAttendance = prefs.targetAttendance
-                App.safetyAfterWeeks = prefs.safetyAfterWeeks
-                App.lastAdTimetsamp = prefs.adTimestap
+                preferences = prefs
+
+                }
+                catch(e: Exception){
+                    preferences = Preferences(0.60, 2, 0, false, listOf())
+                    savePreferences()
+                }
+
             }
         }
 
@@ -153,10 +158,10 @@ class App : Application() {
         }
 
         fun saveStepsToFile() {
-            val filesDir = App.context?.filesDir;
+            val filesDir = context?.filesDir
             val file = File(filesDir, "steps")
             var saveableSteps = arrayOf<SerializableColor>()
-            App.steps.forEach {
+            steps.forEach {
                 saveableSteps += SerializableColor(it.red, it.green, it.blue, it.alpha)
             }
 
@@ -165,15 +170,28 @@ class App : Application() {
         }
 
         fun loadStepsFromFile() {
-            val filesDir = App.context?.filesDir;
+            val filesDir = context?.filesDir
             val file = File(filesDir, "steps")
             if (file.exists()) {
-                val steps = Json.decodeFromString<Array<SerializableColor>>(file.readText())
-                var loadedSteps = arrayOf<Color>()
-                steps.forEach {
-                    loadedSteps += Color(it.red, it.green, it.blue, it.alpha)
+                try{
+                    val steps = Json.decodeFromString<Array<SerializableColor>>(file.readText())
+                    var loadedSteps = arrayOf<Color>()
+                    steps.forEach {
+                        loadedSteps += Color(it.red, it.green, it.blue, it.alpha)
+                    }
+                    App.steps = loadedSteps
                 }
-                App.steps = loadedSteps
+                catch (e: Exception){
+                    App.steps = arrayOf(
+                        Color(210, 2, 2),
+                        Color(183, 96, 6),
+                        Color(154, 156, 10),
+                        Color(69, 131, 12),
+                        Color(13, 107, 16),
+                    )
+                    saveStepsToFile()
+                }
+
             }
         }
 
@@ -185,41 +203,41 @@ class App : Application() {
             val others = sorted.filter { it.name != "Wszystkie" }
             prettyAttendance = listOf(wszystkie!!) + others
 
-            App.saveAttendanceToFile()
+            saveAttendanceToFile()
         }
 
         fun saveTimetableToFile() {
 
-            val filesDir = App.context?.filesDir;
+            val filesDir = context?.filesDir
             val file = File(filesDir, "timetable")
 
-            file.writeText(Json.encodeToString(App.timetable))
+            file.writeText(Json.encodeToString(timetable))
         }
 
         fun loadTimetableFromFile() {
-            val filesDir = App.context?.filesDir;
+            val filesDir = context?.filesDir
             val file = File(filesDir, "timetable")
             if (file.exists()) {
                 val timetable =
-                    Json.decodeFromString<com.gami.can_i_skip.Timetable>(file.readText())
+                    Json.decodeFromString<Timetable>(file.readText())
                 App.timetable = timetable
             }
         }
 
         fun saveAttendanceToFile() {
 
-            val filesDir = App.context?.filesDir;
+            val filesDir = context?.filesDir
             val file = File(filesDir, "subjectsPretty")
 
-            file.writeText(Json.encodeToString(App.prettyAttendance))
+            file.writeText(Json.encodeToString(prettyAttendance))
         }
 
         fun loadAttendanceFromFile() {
-            val filesDir = App.context?.filesDir;
+            val filesDir = context?.filesDir
             val file = File(filesDir, "subjectsPretty")
             if (file.exists()) {
                 val subjectsPretty = Json.decodeFromString<List<AttendancePretty>>(file.readText())
-                App.prettyAttendance = subjectsPretty
+                prettyAttendance = subjectsPretty
             }
         }
 
@@ -228,16 +246,16 @@ class App : Application() {
         }
 
         fun saveCredentialsToFile() {
-            val filesDir = App.context?.filesDir;
+            val filesDir =context?.filesDir
             val file = File(filesDir, "credentials")
 
-            file.writeText(Json.encodeToString(App.credentials))
+            file.writeText(Json.encodeToString(credentials))
 
 
         }
 
         fun getStepRange(stepIdx: Int): Range<Double> {
-            val amountOfSteps = App.steps.size
+            val amountOfSteps = steps.size
             val step = 1.0 / amountOfSteps
 
 
@@ -247,7 +265,7 @@ class App : Application() {
         }
 
         fun loadCredentialsFromFile() {
-            val filesDir = App.context?.filesDir;
+            val filesDir = context?.filesDir
             val file = File(filesDir, "credentials")
             if (file.exists()) {
                 val credentials = Json.decodeFromString<Credentials>(file.readText())
@@ -294,25 +312,25 @@ class App : Application() {
             if (!isSdkPrepared) {
                 prepareSDK()
             }
-            var prettyAttendance = listOf<AttendancePretty>();
-            val subjects = sdk.getSubjects();
-            var attendances: List<AttendanceSummary> = listOf()
+            val prettyAttendance = mutableListOf<AttendancePretty>()
+            val subjects = sdk.getSubjects()
+
             App.subjects = subjects
 
 
-            subjects.forEach {
+            subjects.forEach { it ->
                 val attendance = sdk.getAttendanceSummary(it.id)
 
                 App.attendance += attendance
-                var totalClasses = 0;
-                var presence = 0;
-                var absence = 0;
-                var absenceExcused = 0;
-                var absenceForSchoolReasons = 0;
-                var lateness = 0;
-                var latenessExcused = 0;
-                var exemption = 0;
-                var months = listOf<AttendanceMonth>()
+                var totalClasses = 0
+                var presence = 0
+                var absence = 0
+                var absenceExcused = 0
+                var absenceForSchoolReasons = 0
+                var lateness = 0
+                var latenessExcused = 0
+                var exemption = 0
+                val months = mutableListOf<AttendanceMonth>()
                 attendance.forEach {
                     totalClasses += it.presence + it.absence + it.absenceExcused + it.absenceForSchoolReasons + it.lateness + it.latenessExcused + it.exemption
                     presence += it.presence
@@ -351,7 +369,7 @@ class App : Application() {
 
             }
             App.prettyAttendance = prettyAttendance
-
+            sortAttendanceAlphabetically()
             saveAttendanceToFile()
         }
 

@@ -28,6 +28,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.getValue
@@ -62,16 +63,16 @@ class SettingsFragment : Fragment(R.layout.fragment_day) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var safetyAfterWeeks = App.safetyAfterWeeks
-        var targetAttendance = App.targetAttendance
+        var safetyAfterWeeks = App.preferences.safetyAfterWeeks
+        var targetAttendance = App.preferences.targetAttendance
         var finalSteps = App.steps
 
         var currentlyEditingColorIdx = 0
         var stepsAmount = App.steps.size
 
         fun save() {
-            App.safetyAfterWeeks = safetyAfterWeeks
-            App.targetAttendance = targetAttendance
+            App.preferences.safetyAfterWeeks = safetyAfterWeeks
+            App.preferences.targetAttendance = targetAttendance
             if (finalSteps.size != stepsAmount) {
                 finalSteps = finalSteps.copyOfRange(0, stepsAmount)
             }
@@ -100,7 +101,7 @@ class SettingsFragment : Fragment(R.layout.fragment_day) {
                 ) {
 
 
-                    var safety by rememberSaveable { mutableStateOf(App.safetyAfterWeeks.toString()) }
+                    var safety by rememberSaveable { mutableStateOf(App.preferences.safetyAfterWeeks.toString()) }
                     ListItem(headlineContent = { Text(getString(R.string.set_safety)) },
                         supportingContent = {
                             Text(
@@ -131,7 +132,7 @@ class SettingsFragment : Fragment(R.layout.fragment_day) {
                     HorizontalDivider(modifier = Modifier.padding(12.dp, 0.dp))
 
 
-                    var attendance by rememberSaveable { mutableStateOf((App.targetAttendance * 100).toString()) }
+                    var attendance by rememberSaveable { mutableStateOf((App.preferences.targetAttendance * 100).toString()) }
 
                     ListItem(headlineContent = { Text(getString(R.string.set_attendance)) }, supportingContent = {
                         Text(
@@ -156,7 +157,28 @@ class SettingsFragment : Fragment(R.layout.fragment_day) {
 
                         })
                     HorizontalDivider(modifier = Modifier.padding(12.dp, 0.dp))
+                    var checked by rememberSaveable { mutableStateOf(App.preferences.areNegativesEnabled) }
+                    ListItem(headlineContent = { Text(getString(R.string.set_toggle_negatives)) }, supportingContent = {
+                        Text(
+                            getString(R.string.set_toggle_negatives_desc),
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 12.sp
+                        )
+                    },
 
+                        trailingContent = {
+                            Switch(
+                                checked = checked,
+                                onCheckedChange = {
+                                    App.preferences.areNegativesEnabled = !App.preferences.areNegativesEnabled
+                                    checked = App.preferences.areNegativesEnabled
+                                    Log.d("NEGATIVES", App.preferences.areNegativesEnabled.toString())
+                                }
+                            )
+
+
+                        })
+                    HorizontalDivider(modifier = Modifier.padding(12.dp, 0.dp))
 
                     var steps by rememberSaveable { mutableStateOf((App.steps.size).toString()) }
 

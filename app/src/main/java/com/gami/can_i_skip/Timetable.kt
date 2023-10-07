@@ -198,7 +198,7 @@ class Timetable(
 
     fun getSafetyColorDay(skips: Int): Color {
 
-        val ratio = skips.toDouble()/App.safetyAfterWeeks.toDouble()
+        val ratio = skips.toDouble()/App.preferences.safetyAfterWeeks.toDouble()
         val amountOfSteps = App.steps.size
         val step = 1.0/amountOfSteps
         var index = 0

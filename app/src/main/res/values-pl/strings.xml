@@ -47,4 +47,10 @@
     <string name="no_internet">Brak Internetu</string>
     <string name="refreshing">Odświeżanie</string>
     <string name="refreshed">Odświeżono</string>
+    <string name="set_toggle_negatives">Czy ujemne ominięcia są włączone?</string>
+    <string name="set_toggle_negatives_desc">Gdy sa włączone, pozwalają aby ilość twoich możliwych ominięc zeszła poniżej 0, dając ci w ten sposób znać na ile lekcji musisz iść aby osiągnąć swoją celową obecność.</string>
+
+    <string name="set_disable_subjects">Wykluczone przedmioty</string>
+    <string name="set_disable_subjects_desc">Pozwala na wykluczenie przedmiotów z bycia branym pod uwagę gdy liczona jest ilość dni jakie możesz opuścić. Przydatne gdy jesteś wypisany z jakiegoś przedmiotu, np. Religii</string>
+
 </resources>

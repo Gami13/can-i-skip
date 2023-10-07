@@ -58,7 +58,7 @@ class SubjectFragment : Fragment(R.layout.fragment_subject) {
         val navbar = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
         navbar.visibility = View.VISIBLE
         App.topBar?.visibility = View.VISIBLE
-        
+
         val composeView =
             view.findViewById<androidx.compose.ui.platform.ComposeView>(R.id.compose_view)
 
@@ -77,52 +77,31 @@ class SubjectFragment : Fragment(R.layout.fragment_subject) {
                         if (it.totalClasses != 0) {
                             val ratio = it.howCloseToSafetySubject()
 
-                            if (ratio == -1.0) {
-                                ListItem(
-                                    headlineContent = { Text(it.name) },
-                                    supportingContent = {
-                                        Text(
-                                            getString(
-                                                R.string.current_attendance,
-                                                it.getAttendancePercentage().toString()
-                                            ), fontSize = 12.sp
-                                        )
-                                    },
+
+                            val color = it.getSafetyColorSubject(ratio)
+                            Log.d("SUBJECT VIEW", it.name + " " + ratio.toString() + " " + color.toString())
+                            ListItem(
+                                headlineContent = { Text(it.name) },
+                                supportingContent = {
+                                    Text(
+                                        getString(
+                                            R.string.current_attendance,
+                                            it.getAttendancePercentage().toString()
+                                        ), fontSize = 12.sp
+                                    )
+                                },
 
 
-                                    trailingContent = {
-                                        Text(
-                                            it.howManyClassesCanSkip().toString(),
-                                            fontSize = 20.sp
-                                        )
-                                    }
-                                )
-                            } else {
+                                trailingContent = {
+                                    Text(
+                                        it.howManyClassesCanSkip().toString(),
+                                        fontSize = 20.sp,
+                                        color = color,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            )
 
-                                val color = it.getSafetyColorSubject(ratio)
-
-                                ListItem(
-                                    headlineContent = { Text(it.name) },
-                                    supportingContent = {
-                                        Text(
-                                            getString(
-                                                R.string.current_attendance,
-                                                it.getAttendancePercentage().toString()
-                                            ), fontSize = 12.sp
-                                        )
-                                    },
-
-
-                                    trailingContent = {
-                                        Text(
-                                            it.howManyClassesCanSkip().toString(),
-                                            fontSize = 20.sp,
-                                            color = color,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    }
-                                )
-                            }
 
                             HorizontalDivider(modifier = Modifier.padding(12.dp, 0.dp))
                         }
@@ -130,13 +109,10 @@ class SubjectFragment : Fragment(R.layout.fragment_subject) {
                     }
 
 
-
                 }
 
 
             }
-
-
 
 
         }

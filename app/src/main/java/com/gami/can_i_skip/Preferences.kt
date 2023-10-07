@@ -6,10 +6,12 @@ import kotlinx.serialization.Serializable
 class Preferences(
     var targetAttendance: Double,
     var safetyAfterWeeks: Int,
-    var adTimestap: Long
+    var lastAdTimestamp: Long,
+    var areNegativesEnabled : Boolean,
+    var disabledSubjects: List<String>
 
 ) {
     override fun toString(): String {
-        return "Preferences(targetAttendance=$targetAttendance, safetyAfterWeeks=$safetyAfterWeeks), adTimestap=$adTimestap"
+        return "Preferences(targetAttendance=$targetAttendance, safetyAfterWeeks=$safetyAfterWeeks), adTimestap=$lastAdTimestamp, areNegativesEnabled=$areNegativesEnabled, disabledSubjects=$disabledSubjects)"
     }
 }

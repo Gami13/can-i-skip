@@ -46,6 +46,13 @@
     <string name="set_attendance">Target attendance</string>
     <string name="set_attendance_desc">Your targeted attendance, used for calculating how many classes you can skip..</string>
 
+    <string name="set_toggle_negatives">Are negative skips enabled?</string>
+    <string name="set_toggle_negatives_desc">If enabled the amount of times you can skip will be able to go below 0, telling you how many times you have to attend to reach your target attendance.</string>
+
+    <string name="set_disable_subjects">Disabled subjects</string>
+    <string name="set_disable_subjects_desc">Allows you to disable subjects from being counted into the amount of days you are allowed to skip. Useful if you don\'t attend certain classes like Religion.</string>
+
+
     <string name="set_steps">Amount of steps</string>
     <string name="set_steps_desc">Customize the amount of color steps used for the skips.</string>
     <string name="set_step">Step %1$s</string>
