@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 
 import androidx.compose.foundation.layout.Box
 
@@ -23,6 +24,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -59,6 +64,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 
+@OptIn(ExperimentalMaterial3Api::class)
 class SettingsFragment : Fragment(R.layout.fragment_day) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,6 +72,7 @@ class SettingsFragment : Fragment(R.layout.fragment_day) {
         var safetyAfterWeeks = App.preferences.safetyAfterWeeks
         var targetAttendance = App.preferences.targetAttendance
         var finalSteps = App.steps
+        var disabledSubjects = App.preferences.disabledSubjects
 
         var currentlyEditingColorIdx = 0
         var stepsAmount = App.steps.size
@@ -77,6 +84,7 @@ class SettingsFragment : Fragment(R.layout.fragment_day) {
                 finalSteps = finalSteps.copyOfRange(0, stepsAmount)
             }
             App.steps = finalSteps
+            App.preferences.disabledSubjects = disabledSubjects
             Log.d("SAVE", "WeeksSafety: $safetyAfterWeeks, TargetAttendance: $targetAttendance")
             App.saveEverythingToFile()
             Toast.makeText(view.context, "Saved", Toast.LENGTH_SHORT).show()
@@ -134,13 +142,14 @@ class SettingsFragment : Fragment(R.layout.fragment_day) {
 
                     var attendance by rememberSaveable { mutableStateOf((App.preferences.targetAttendance * 100).toString()) }
 
-                    ListItem(headlineContent = { Text(getString(R.string.set_attendance)) }, supportingContent = {
-                        Text(
-                            getString(R.string.set_attendance_desc),
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 12.sp
-                        )
-                    },
+                    ListItem(headlineContent = { Text(getString(R.string.set_attendance)) },
+                        supportingContent = {
+                            Text(
+                                getString(R.string.set_attendance_desc),
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 12.sp
+                            )
+                        },
 
                         trailingContent = {
                             TextField(value = attendance,
@@ -158,21 +167,26 @@ class SettingsFragment : Fragment(R.layout.fragment_day) {
                         })
                     HorizontalDivider(modifier = Modifier.padding(12.dp, 0.dp))
                     var checked by rememberSaveable { mutableStateOf(App.preferences.areNegativesEnabled) }
-                    ListItem(headlineContent = { Text(getString(R.string.set_toggle_negatives)) }, supportingContent = {
-                        Text(
-                            getString(R.string.set_toggle_negatives_desc),
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 12.sp
-                        )
-                    },
+                    ListItem(headlineContent = { Text(getString(R.string.set_toggle_negatives)) },
+                        supportingContent = {
+                            Text(
+                                getString(R.string.set_toggle_negatives_desc),
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 12.sp
+                            )
+                        },
 
                         trailingContent = {
                             Switch(
                                 checked = checked,
                                 onCheckedChange = {
-                                    App.preferences.areNegativesEnabled = !App.preferences.areNegativesEnabled
+                                    App.preferences.areNegativesEnabled =
+                                        !App.preferences.areNegativesEnabled
                                     checked = App.preferences.areNegativesEnabled
-                                    Log.d("NEGATIVES", App.preferences.areNegativesEnabled.toString())
+                                    Log.d(
+                                        "NEGATIVES",
+                                        App.preferences.areNegativesEnabled.toString()
+                                    )
                                 }
                             )
 
@@ -182,13 +196,14 @@ class SettingsFragment : Fragment(R.layout.fragment_day) {
 
                     var steps by rememberSaveable { mutableStateOf((App.steps.size).toString()) }
 
-                    ListItem(headlineContent = { Text(getString(R.string.set_steps)) }, supportingContent = {
-                        Text(
-                            getString(R.string.set_steps_desc),
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 12.sp
-                        )
-                    },
+                    ListItem(headlineContent = { Text(getString(R.string.set_steps)) },
+                        supportingContent = {
+                            Text(
+                                getString(R.string.set_steps_desc),
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 12.sp
+                            )
+                        },
 
                         trailingContent = {
                             TextField(
@@ -219,11 +234,18 @@ class SettingsFragment : Fragment(R.layout.fragment_day) {
                             }
                             val stepRange = App.getStepRange(i)
                             Column(modifier = Modifier.padding(16.dp, 0.dp)) {
-                                ListItem(headlineContent = { Text(getString(R.string.set_step, (i+1).toString())) },
+                                ListItem(headlineContent = {
+                                    Text(
+                                        getString(
+                                            R.string.set_step,
+                                            (i + 1).toString()
+                                        )
+                                    )
+                                },
 
                                     supportingContent = {
                                         Text(
-                                            "${stepRange.lower*100}% - ${stepRange.upper*100}%",
+                                            "${stepRange.lower * 100}% - ${stepRange.upper * 100}%",
                                             fontWeight = FontWeight.Normal,
                                             fontSize = 12.sp
                                         )
@@ -251,16 +273,132 @@ class SettingsFragment : Fragment(R.layout.fragment_day) {
                             }
                         }
                     }
+                    var removedSubjects by rememberSaveable { mutableStateOf(App.preferences.disabledSubjects) }
+                    var options = App.prettyAttendance.map { it.name }
+                        .filter { it != "Wszystkie" && !removedSubjects.contains(it) }
+                    var expanded by rememberSaveable { mutableStateOf(false) }
+                    var selectedOptionText by rememberSaveable { mutableStateOf(options[0]) }
+                    fun refreshOptions() {
+
+                        options = App.subjects.map { it.name }
+                            .filter { it != "Wszystkie" && !removedSubjects.contains(it) }
+                        selectedOptionText = options[0]
+                        disabledSubjects = removedSubjects
+
+                    }
+                    ListItem(headlineContent = { Text(getString(R.string.set_disable_subjects)) },
+                        supportingContent = {
+                            Text(
+                                getString(R.string.set_disable_subjects_desc),
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 12.sp
+                            )
+                        },
 
 
+                        trailingContent = {
 
-                    ListItem(headlineContent = { Text(getString(R.string.set_timetable)) }, supportingContent = {
-                        Text(
-                            getString(R.string.set_timetable_desc),
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 12.sp
-                        )
-                    },
+                            Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                ExposedDropdownMenuBox(
+                                    expanded = expanded,
+                                    onExpandedChange = { expanded = !expanded },
+                                    modifier = Modifier.width(160.dp)
+                                ) {
+                                    TextField(
+                                        // The `menuAnchor` modifier must be passed to the text field for correctness.
+                                        modifier = Modifier.menuAnchor(),
+                                        readOnly = true,
+                                        value = selectedOptionText,
+                                        onValueChange = {},
+                                        label = { Text(getString(R.string.subject)) },
+                                        trailingIcon = {
+                                            ExposedDropdownMenuDefaults.TrailingIcon(
+                                                expanded = expanded
+                                            )
+                                        },
+                                    )
+                                    ExposedDropdownMenu(
+                                        expanded = expanded,
+                                        onDismissRequest = { expanded = false }) {
+
+                                        options.forEach { selectionOption ->
+                                            DropdownMenuItem(
+                                                text = { Text(selectionOption) },
+                                                onClick = {
+                                                    selectedOptionText = selectionOption
+                                                    expanded = false
+                                                },
+                                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                                            )
+                                        }
+                                    }
+
+                                }
+                                Button(
+                                    onClick = {
+
+
+                                        removedSubjects += selectedOptionText
+                                        refreshOptions()
+
+
+                                    },
+
+
+                                    ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.add),
+                                        contentDescription = "PLACEHOLDER ADD",
+                                    )
+                                }
+
+                            }
+
+
+                        })
+                    HorizontalDivider(modifier = Modifier.padding(12.dp, 0.dp))
+                    if (removedSubjects.isNotEmpty()) {
+                        for (i in 0..removedSubjects.size - 1) {
+                            Column(modifier = Modifier.padding(16.dp, 0.dp)) {
+                                ListItem(headlineContent = { Text(removedSubjects[i]) },
+
+
+                                    trailingContent = {
+                                        Button(
+                                            onClick = {
+                                                removedSubjects -= removedSubjects[i]
+                                                refreshOptions()
+
+
+                                            },
+
+
+                                            modifier = Modifier
+                                                .height(40.dp)
+
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.delete),
+                                                contentDescription = "PLACEHOLDER DELETE",
+                                            )
+
+                                        }
+
+                                    })
+                                HorizontalDivider(modifier = Modifier.padding(12.dp, 0.dp))
+                            }
+                        }
+                    }
+
+
+                    ListItem(headlineContent = { Text(getString(R.string.set_timetable)) },
+                        supportingContent = {
+                            Text(
+                                getString(R.string.set_timetable_desc),
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 12.sp
+                            )
+                        },
 
                         trailingContent = {
                             Button(
@@ -279,23 +417,24 @@ class SettingsFragment : Fragment(R.layout.fragment_day) {
 
 
                     HorizontalDivider(modifier = Modifier.padding(12.dp, 0.dp))
-                    ListItem(headlineContent = { Text(getString(R.string.log_out)) }, supportingContent = {
-                        Text(
-                            getString(R.string.log_out_desc),
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 12.sp
-                        )
-                    },
+                    ListItem(headlineContent = { Text(getString(R.string.log_out)) },
+                        supportingContent = {
+                            Text(
+                                getString(R.string.log_out_desc),
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 12.sp
+                            )
+                        },
 
                         trailingContent = {
                             Button(
                                 onClick = {
                                     App.logOut()
-                                    val transaction = activity?.supportFragmentManager?.beginTransaction()
+                                    val transaction =
+                                        activity?.supportFragmentManager?.beginTransaction()
                                     transaction?.replace(R.id.fragmentHost, LoginFragment())
                                     transaction?.disallowAddToBackStack()
                                     transaction?.commit()
-
 
 
                                 },
@@ -310,93 +449,93 @@ class SettingsFragment : Fragment(R.layout.fragment_day) {
 
 
                 }
-                Box() {
-                    FloatingActionButton(
-                        onClick = { save() },
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(12.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.save),
-                            contentDescription = getString(R.string.save),
-                        )
 
 
-                    }
+            Box() {
+                FloatingActionButton(
+                    onClick = { save() },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(12.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.save),
+                        contentDescription = getString(R.string.save),
+                    )
+
+
                 }
-                if (showColorPicker) {
-                    Log.d("COLOR", "SHOW")
+            }
+            if (showColorPicker) {
+                Log.d("COLOR", "SHOW")
 
-                    Box(
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.6f))
+                ) {
+                    val colorController = rememberColorPickerController(
+
+                    )
+                    Card(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.6f))
+                            .width(320.dp)
+                            .height(420.dp)
+                            .padding(16.dp)
+                            .align(Alignment.Center)
                     ) {
-                        val colorController = rememberColorPickerController(
-
-                        )
-                        Card(
-                            modifier = Modifier
-                                .width(320.dp)
-                                .height(420.dp)
+                        Text(
+                            text = getString(R.string.pick_color), modifier = Modifier
                                 .padding(16.dp)
-                                .align(Alignment.Center)
-                        ) {
-                            Text(
-                                text = getString(R.string.pick_color), modifier = Modifier
-                                    .padding(16.dp)
-                                    .align(
-                                        Alignment.CenterHorizontally
-                                    ),
+                                .align(
+                                    Alignment.CenterHorizontally
+                                ),
 
-                                fontSize = 32.sp, textAlign = TextAlign.Center
-                            )
-                            var chosenColor = Color.Red
+                            fontSize = 32.sp, textAlign = TextAlign.Center
+                        )
+                        var chosenColor = Color.Red
 
-                            HsvColorPicker(controller = colorController,
-                                modifier = Modifier
-                                    .width(240.dp)
-                                    .height(240.dp)
-                                    .align(Alignment.CenterHorizontally),
-                                onColorChanged = {
+                        HsvColorPicker(controller = colorController,
+                            modifier = Modifier
+                                .width(240.dp)
+                                .height(240.dp)
+                                .align(Alignment.CenterHorizontally),
+                            onColorChanged = {
 
-                                    chosenColor = it.color
+                                chosenColor = it.color
 
-                                })
-                            Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                                Button(
-                                    onClick = {
-                                        showColorPicker = false
-                                        changableSteps[currentlyEditingColorIdx] = chosenColor;
-                                        finalSteps = changableSteps
+                            })
+                        Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                            Button(
+                                onClick = {
+                                    showColorPicker = false
+                                    changableSteps[currentlyEditingColorIdx] = chosenColor;
+                                    finalSteps = changableSteps
 
-                                    }, modifier = Modifier.padding(16.dp)
+                                }, modifier = Modifier.padding(16.dp)
 
-                                ) {
-                                    Text(getString(R.string.done))
-                                }
-                                Button(
-                                    onClick = {
-                                        showColorPicker = false
-
-                                    }, modifier = Modifier.padding(16.dp)
-
-                                ) {
-                                    Text(getString(R.string.cancel))
-                                }
+                            ) {
+                                Text(getString(R.string.done))
                             }
+                            Button(
+                                onClick = {
+                                    showColorPicker = false
 
+                                }, modifier = Modifier.padding(16.dp)
 
+                            ) {
+                                Text(getString(R.string.cancel))
+                            }
                         }
 
 
                     }
-                } else {
-                    Log.d("COLOR", "HIDE")
+
+
                 }
-
-
+            } else {
+                Log.d("COLOR", "HIDE")
+            }
             }
         }
 

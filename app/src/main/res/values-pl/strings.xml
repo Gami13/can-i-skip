@@ -52,5 +52,6 @@
 
     <string name="set_disable_subjects">Wykluczone przedmioty</string>
     <string name="set_disable_subjects_desc">Pozwala na wykluczenie przedmiotów z bycia branym pod uwagę gdy liczona jest ilość dni jakie możesz opuścić. Przydatne gdy jesteś wypisany z jakiegoś przedmiotu, np. Religii</string>
+    <string name="subject">Przedmiot</string>
 
 </resources>

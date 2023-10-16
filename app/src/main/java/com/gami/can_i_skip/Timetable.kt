@@ -155,11 +155,11 @@ class Timetable(
     fun howManyDaysCanSkip(dayOfWeek: DayOfWeek):Int {
         var subjects : Map<String,Int> = mapOf()
         when (dayOfWeek){
-            DayOfWeek.MONDAY -> subjects = monday.groupingBy { it.name }.eachCount()
-            DayOfWeek.TUESDAY -> subjects = tuesday.groupingBy { it.name }.eachCount()
-            DayOfWeek.WEDNESDAY -> subjects = wednesday.groupingBy { it.name }.eachCount()
-            DayOfWeek.THURSDAY -> subjects = thursday.groupingBy { it.name }.eachCount()
-            DayOfWeek.FRIDAY -> subjects = friday.groupingBy { it.name }.eachCount()
+            DayOfWeek.MONDAY -> subjects = monday.filter { !App.preferences.disabledSubjects.contains(it.name)}.groupingBy { it.name }.eachCount()
+            DayOfWeek.TUESDAY -> subjects = tuesday.filter { !App.preferences.disabledSubjects.contains(it.name)}.groupingBy { it.name }.eachCount()
+            DayOfWeek.WEDNESDAY -> subjects = wednesday.filter { !App.preferences.disabledSubjects.contains(it.name)}.groupingBy { it.name }.eachCount()
+            DayOfWeek.THURSDAY -> subjects = thursday.filter { !App.preferences.disabledSubjects.contains(it.name)}.groupingBy { it.name }.eachCount()
+            DayOfWeek.FRIDAY -> subjects = friday.filter { !App.preferences.disabledSubjects.contains(it.name)}.groupingBy { it.name }.eachCount()
             else -> Log.d("TimeTable", "Unknown day of week")
         }
         val correspondingAttendancePretty =
